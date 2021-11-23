@@ -1,0 +1,6 @@
+apiVersion: dj.dysproz.io/v1
+kind: DaemonJob
+metadata:
+  name: daemonjob-sample
+spec:
+  # Add fields here
