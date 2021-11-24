@@ -29,7 +29,7 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
 # dysproz.io/deamonjob-bundle:$VERSION and dysproz.io/deamonjob-catalog:$VERSION.
-IMAGE_TAG_BASE ?= dysproz.io/deamonjob
+IMAGE_TAG_BASE ?= xvjixiang/deamonjob
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
