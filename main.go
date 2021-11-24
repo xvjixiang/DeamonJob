@@ -79,8 +79,8 @@ func main() {
 	}
 
 	if err = (&controllers.DaemonJobReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:          mgr.GetClient(),
+		DaemonJobScheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DaemonJob")
 		os.Exit(1)

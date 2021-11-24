@@ -39,8 +39,13 @@ import (
 // DaemonJobReconciler reconciles a DaemonJob object
 type DaemonJobReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	DaemonJobScheme *runtime.Scheme
+	Log             logr.Logger
+}
+
+// Scheme returns ASE scheme to implement Client interface
+func (reconciler *DaemonJobReconciler) Scheme() *runtime.Scheme {
+	return reconciler.DaemonJobScheme
 }
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -52,7 +57,7 @@ type DaemonJobReconciler struct {
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.10.0/pkg/reconcile
-func (r *DaemonJobReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *DaemonJobReconciler) Reconcile(contx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// your logic here
 	_ = context.Background()
 	_ = r.Log.WithValues("daemonjob", req.NamespacedName)
@@ -82,7 +87,7 @@ func (r *DaemonJobReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 	jobReplicas := int32(len(nodes.Items))
 	job := getJob(instance, &jobReplicas, req.Name, instanceType)
-	err := controllerutil.SetControllerReference(instance, job, r.Scheme)
+	err := controllerutil.SetControllerReference(instance, job, r.DaemonJobScheme)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -91,7 +96,7 @@ func (r *DaemonJobReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	clusterJob.ObjectMeta = job.ObjectMeta
 	_, err = ctrl.CreateOrUpdate(ctx, r, &clusterJob, func() error {
 		modifyJob(job, &clusterJob)
-		return controllerutil.SetControllerReference(instance, &clusterJob, r.Scheme)
+		return controllerutil.SetControllerReference(instance, &clusterJob, r.DaemonJobScheme)
 	})
 	if err != nil {
 		if errors.IsInvalid(err) {
@@ -105,7 +110,6 @@ func (r *DaemonJobReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	return ctrl.Result{}, r.Client.Status().Update(context.TODO(), instance)
 
-	return ctrl.Result{}, nil
 }
 
 func getJob(instance *djv1.DaemonJob, replicas *int32, reqName, instanceType string) *batchv1.Job {
